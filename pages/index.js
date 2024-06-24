@@ -1,46 +1,7 @@
 import Link from "@/components/Link";
 import Arrow from "@/components/Arrow";
 import * as Collapsible from "@radix-ui/react-collapsible";
-import { google } from "googleapis";
 import React from "react";
-
-export async function getStaticProps() {
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n");
-  const auth = await google.auth.getClient({
-    scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
-    projectId: process.env.GOOGLE_PROJECT_ID,
-    credentials: {
-      private_key: privateKey,
-      client_email: process.env.GOOGLE_CLIENT_EMAIL,
-    },
-  });
-  const sheets = google.sheets({ version: "v4", auth });
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: process.env.SHEET_ID,
-    range: "Sheet1!A:O",
-  });
-
-  const rows = [];
-  const rawRows = res.data.values || [];
-  const headers = rawRows.shift();
-
-  rawRows.forEach((row) => {
-    const rowData = {};
-    row.forEach((item, index) => {
-      rowData[headers[index]] = item;
-    });
-    rows.push(rowData);
-  });
-
-  const parks = rows;
-
-  return {
-    props: {
-      parks,
-    },
-    revalidate: 10,
-  };
-}
 
 export default function Home({ parks }) {
   const ParkRow = (props) => {
@@ -72,7 +33,7 @@ export default function Home({ parks }) {
               isExternal
               className="z-10 p-1 ml-4 leading-none transition rounded-sm bg-sally/50 w-fit hover:bg-mcqueen hover:text-white tabular-nums text-sm"
             >
-              {latitude.substr(0, 8)}, {longitude.substr(0, 8)}
+              "latitude"
             </Link>
             <div className="ml-auto transition-transform duration-300 group-data-[state='open']:rotate-90 place-self-center">
               <Arrow />
@@ -146,7 +107,7 @@ export default function Home({ parks }) {
         <li>
           <Collapsible.Trigger className="flex justify-center items-center gap-x-4 w-full pr-4 group">
             <div className="bg-mcqueen text-white px-4 py-6 z-10 w-full max-w-[3.5rem] -mb-px tabular-nums">
-              {id.padStart(2, "0")}
+              "______"
             </div>
             <div className="flex flex-col text-left">
               <span>{parkName}</span>
@@ -195,7 +156,7 @@ export default function Home({ parks }) {
                       isExternal
                       className="underline transition hover:bg-sally/50 underline-offset-4 w-fit"
                     >
-                      {latitude.substr(0, 8)}, {longitude.substr(0, 8)}
+                      "latitude"
                     </Link>
                   </div>
                 </div>
@@ -210,25 +171,20 @@ export default function Home({ parks }) {
   return (
     <main className="w-full h-full">
       <ul className="sm:hidden grid w-full divide-y divide-mcqueen border-t-2 border-mcqueen">
-        {parks.map((park) => (
-          <MobileParkRow key={park.id} {...park} />
-        ))}
+          <MobileParkRow/>
       </ul>
       <div className="hidden sm:block">
         <div className="text-xl border-b-2 border-mcqueen">
           <ul className="grid w-full px-4 grid-cols-yeah">
-            <li className="pl-12 ml-1.5">Park</li>
-            <li>City</li>
-            <li>Country</li>
-            <li>Notable Feature</li>
-            <li className="pl-4">Map</li>
+            <li className="pl-12 ml-1.5">Artist</li>
+            <li>Label</li>
+            <li></li>
+            <li className="pl-4">Genre</li>
           </ul>
         </div>
         <div className="grid isolate">
           <ul className="z-10 border-b divide-y border-mcqueen divide-mcqueen park overlay">
-            {parks.map((park) => (
-              <ParkRow key={park.id} {...park} />
-            ))}
+              <ParkRow />
           </ul>
           <div className="w-full h-full content">
             <div className="grid w-full h-full px-4 grid-cols-yeah col-divider" />
